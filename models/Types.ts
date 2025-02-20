@@ -13,3 +13,13 @@ export type Token = {
     userId: number;
     token: string;
 }
+
+export type Post = {
+    id: number;
+    body: string | null;
+    image: string | null;
+    video: string | null;
+    createdBy?: number | null;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+}

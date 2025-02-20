@@ -1,4 +1,4 @@
-import { User } from "./User";
+import { User } from "./Types";
 
 export type ReturnType = { 
   accessToken: string; 

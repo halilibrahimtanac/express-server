@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
+import { User } from '../models/Types';
 
 class JWTService {
     private static instance: JWTService;

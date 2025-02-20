@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import BaseRepository from "./BaseRepository";
-import { User } from "../models/User";
+import { User } from "../models/Types";
 import { IUserRepository } from "../models/IUserRepository";
 
 class UserRepository extends BaseRepository implements IUserRepository {

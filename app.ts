@@ -1,4 +1,4 @@
-import express, { Router, Request, Response, NextFunction } from "express";
+import express, { Router, Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -37,12 +37,29 @@ async function registerRoutes() {
   }
 }
 
-registerRoutes();
+registerRoutes().then(() => {
+  const globalErrorHandler: ErrorRequestHandler = (
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    console.error("Global Error:", err.stack);
+  
+    if (err.message.includes("At least one of body, image, or video must be provided")) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+  
+    res.status(500).json({ error: "Internal Server Error" });
+    return; // Ensures function returns void
+  };
 
-// Global error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: err.message });
+  app.use(globalErrorHandler);
+
+  console.log("✅ Routes registered, error handler added.");
+}).catch(err => {
+  console.error("Error registering routes:", err);
 });
 
 app.listen(PORT, () => {

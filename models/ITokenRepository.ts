@@ -1,4 +1,4 @@
-import { Token, User } from "./User";
+import { Token, User } from "./Types";
 
 export interface ITokenRepository {
     getUserToken(tkn: string): Promise<{ user: Partial<User>} & Partial<Token>  | null>;

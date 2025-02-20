@@ -1,5 +1,5 @@
 import { IUserService, ReturnType } from "../models/IUserService";
-import { User } from "../models/User";
+import { User } from "../models/Types";
 import { IUserRepository } from "../models/IUserRepository";
 import JWTService from "./JWTService";
 import { IPasswordService } from "../models/IPasswordService";

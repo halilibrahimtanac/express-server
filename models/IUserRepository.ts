@@ -1,9 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { User } from "./User";
-
-export interface IDBClient {
-    dbClient: PrismaClient,
-}
+import { User } from "./Types";
 
 export interface IUserRepository {
     addUser(user: User): Promise<User>,
