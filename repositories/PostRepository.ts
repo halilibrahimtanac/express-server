@@ -64,6 +64,18 @@ class PostRepository extends BaseRepository implements IPostRepository {
 
       return createdPost;
   }
+
+  async deletePost(username: string, postId: number): Promise<Post | null> {
+    const user = await this.getUserByUserName(username, ["id"]);
+
+    if (!user) {
+      return null;
+    }
+
+    const result = await this.dbClient.post.delete({ where: { id: postId, createdBy: user.id }});
+
+    return result;
+  }
 }
 
 export default PostRepository;

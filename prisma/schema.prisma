@@ -21,27 +21,31 @@ model User {
   userType  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  token     Token?
+  token     Token[]
   Post      Post[]
 }
 
 model Token {
   id     Int    @id @default(autoincrement())
-  userId Int    @unique
+  userId Int    
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token  String
+  token  String @db.VarChar(255)
+  type   String
 
   // Define a unique index on userId and token
-  @@unique([userId, token], name: "userId_token_unique")
+  @@unique([userId, token, type], name: "userId_token_unique")
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  body      String?
-  image     String?
-  video     String?
-  createdBy Int
-  user      User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  body       String?
+  image      String?
+  video      String?
+  createdBy  Int
+  user       User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  parentPost Int?     // Allow null for top-level posts
+  parent     Post?    @relation("PostToParent", fields: [parentPost], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Post_parent_fkey")
+  children   Post[]   @relation("PostToParent")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

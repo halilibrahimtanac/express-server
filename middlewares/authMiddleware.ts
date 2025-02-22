@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import JWTService from "../services/JWTService";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 declare global {
   namespace Express {
@@ -9,7 +12,7 @@ declare global {
   }
 }
 
-export default function authorize(
+export default async function authorize(  // Make the function async
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,6 +39,20 @@ export default function authorize(
   try {
     const jwtService = JWTService.getInstance();
     const decoded = jwtService.verifyAccessToken(token);
+
+    // Check if token exists in database
+    const tokenExists = await prisma.token.findFirst({
+      where: {
+        userId: decoded.id,
+        token: token
+      }
+    });
+
+    if (!tokenExists) {
+      res.status(401).json({ error: "Token has been invalidated" });
+      return;
+    }
+
     req.user = decoded;
     next();
   } catch (error) {

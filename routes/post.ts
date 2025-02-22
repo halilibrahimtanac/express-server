@@ -9,5 +9,6 @@ const postController = new PostController(postService);
 
 router.get("/get-posts", authorize, (req, res, next) => postController.getPosts(req, res, next));
 router.post("/new-post", authorize, (req, res, next) => postController.createPost(req, res, next));
+router.get("/delete-post/:postId", authorize, (req, res, next) => postController.deletePost(req, res, next))
 
 export default router;

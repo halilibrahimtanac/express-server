@@ -23,4 +23,22 @@ export default class PostController {
       next(err);
     }
   }
+
+  async deletePost(req: Request, res: Response, next: NextFunction){
+    try{
+      const { user } = req;
+      const { postId } = req.params;
+      const parsedId = parseInt(postId);
+
+      if(isNaN(parsedId) || parsedId === 0){
+        throw new Error("Invalid post id.");
+      }
+
+      const result = await this.postService.deletePost(user.username, parsedId);
+
+      res.status(200).json({ message: "Post successfully deleted.", result });
+    }catch(err){
+      next(err);
+    }
+  }
 }

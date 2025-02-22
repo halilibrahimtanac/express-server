@@ -1,5 +1,6 @@
-import { PrismaClient, Token } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { ITokenRepository } from "../models/ITokenRepository";
+import { Token } from "../models/Types";
 import BaseRepository from "./BaseRepository";
 
 class TokenRepository extends BaseRepository implements ITokenRepository {
@@ -17,15 +18,30 @@ class TokenRepository extends BaseRepository implements ITokenRepository {
       where: { token: tkn },
     });
   }
-
-  async addUserToken(tokenObj: Token) {
-    return await this.dbClient.token.create({
-      data: { userId: tokenObj.userId, token: tokenObj.token },
+  
+  async addUserToken(token: Token): Promise<Token> {
+    const result = await this.dbClient.token.create({
+      data: {
+        userId: token.userId,
+        token: token.token,
+        type: token.type
+      },
     });
+    
+    return {
+      id: result.id,
+      userId: result.userId,
+      token: result.token,
+      type: result.type as "refresh" | "access"
+    };
   }
+  
+  async removeUserToken(rTkn: string, aTkn: string): Promise<{ count: number }> {
+    const result = await this.dbClient.token.deleteMany({ 
+      where: { OR: [{ token: rTkn }, { token: aTkn }] } 
+    });
 
-  async removeUserToken(tkn: string) {
-    return await this.dbClient.token.deleteMany({ where: { token: tkn } });
+    return { count: result.count };
   }
 }
 

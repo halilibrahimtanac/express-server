@@ -43,6 +43,13 @@ class UserService implements IUserService {
     await this.tokenRepository.addUserToken({
       userId: createdUser.id,
       token: refreshToken,
+      type: "refresh"
+    });
+
+    await this.tokenRepository.addUserToken({
+      userId: createdUser.id,
+      token: accessToken,
+      type: "access"
     });
 
     return { accessToken, refreshToken, user: userPayload };
@@ -78,14 +85,21 @@ class UserService implements IUserService {
     await this.tokenRepository.addUserToken({
       userId: user.id,
       token: refreshToken,
+      type: "refresh"
+    });
+
+    await this.tokenRepository.addUserToken({
+      userId: user.id,
+      token: accessToken,
+      type: "access"
     });
 
     return { accessToken, refreshToken, user: userPayload };
   }
 
-  async logout(rfrshTkn: string) {
+  async logout(rfrshTkn: string, accessTkn: string) {
     try {
-      return await this.tokenRepository.removeUserToken(rfrshTkn);
+      return await this.tokenRepository.removeUserToken(rfrshTkn, accessTkn);
     } catch (err: any) {
       throw new Error(err.message);
     }

@@ -39,20 +39,18 @@ async function registerRoutes() {
 
 registerRoutes().then(() => {
   const globalErrorHandler: ErrorRequestHandler = (
-    err: Error,
+    err: any,
     req: Request,
     res: Response,
     next: NextFunction
   ): void => {
     console.error("Global Error:", err.stack);
-  
-    if (err.message.includes("At least one of body, image, or video must be provided")) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-  
-    res.status(500).json({ error: "Internal Server Error" });
-    return; // Ensures function returns void
+
+    // Default server error
+    res.status(500).json({ 
+      error: err.message,
+    });
+    return;
   };
 
   app.use(globalErrorHandler);
