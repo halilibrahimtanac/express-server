@@ -21,7 +21,7 @@ export type Post = {
   image: string | null;
   video: string | null;
   createdBy?: number | null;
-  parentId?: number | null;
+  parentPost?: number | null;
   createdAt?: Date | null;
   updatedAt?: Date | null;
 };

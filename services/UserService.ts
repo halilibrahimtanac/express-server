@@ -117,18 +117,36 @@ class UserService implements IUserService {
         ...foundResult.user,
       });
 
+      const user = await this.userRepository.getUserByUserName(verified.username, ["id"]);
+      if (!user) throw new Error("User not found");
+      const userId = user.id;
+
+      if(!userId) throw new Error("Invalid user ID!")
+
+      await this.tokenRepository.addUserToken({
+        userId: userId,
+        token: accessToken,
+        type: "access"
+      });
+
       return accessToken;
-    } catch (err) {
-      throw new Error("Invalid token!");
+    } catch (err: any) {
+      throw new Error(err.message);
     }
   }
 
-  async profile(id: number) {
+  async profile(username: string) {
     try {
-      if (!id) {
+      if (!username) {
         throw new Error("Invalid ID!");
       }
-      const user = await this.userRepository.getUserById(id);
+      const user = await this.userRepository.getUserByUserName(username, [
+        "username",
+        "email",
+        "userType",
+        "createdAt",
+        "id",
+      ]);
 
       return user;
     } catch (err) {

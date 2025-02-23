@@ -68,9 +68,8 @@ export default class UserController {
 
   async profile(req: Request, res: Response, next: NextFunction){
     try{
-      const { id:idParam } = req.params;
-      let id = (idParam && !isNaN(Number(idParam))) ? parseInt(idParam) : 0;
-      const result = await this.userService.profile(id);
+      const { user } = req;
+      const result = await this.userService.profile(user.username);
 
       res.status(200).json(result);
     }catch(err){

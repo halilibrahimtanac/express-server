@@ -5,10 +5,38 @@ export default class PostController {
   constructor(private postService: IPostService) {}
 
   async getPosts(req: Request, res: Response, next: NextFunction) {
-    const { user } = req;
-    const result = await this.postService.getPosts(user.username);
+    try {
+      const { user } = req;
+      const result = await this.postService.getPosts(user.username);
 
-    res.status(200).json({ posts: result });
+      res.status(200).json({ posts: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getAllPosts(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this.postService.getAllPosts();
+
+      res.status(200).json({ posts: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getRelatedPosts(req: Request, res: Response, next: NextFunction){
+    try{
+      const { postId } = req.params;
+      let parsedId = parseInt(postId);
+      if(isNaN(parsedId) || parsedId === 0) throw new Error("Invalid post id.");
+
+      const result = await this.postService.getRelatedPosts(parsedId);
+
+      res.status(200).json({ posts: result });
+    }catch(err){
+      next(err);
+    }
   }
 
   async createPost(req: Request, res: Response, next: NextFunction) {
@@ -24,20 +52,20 @@ export default class PostController {
     }
   }
 
-  async deletePost(req: Request, res: Response, next: NextFunction){
-    try{
+  async deletePost(req: Request, res: Response, next: NextFunction) {
+    try {
       const { user } = req;
       const { postId } = req.params;
       const parsedId = parseInt(postId);
 
-      if(isNaN(parsedId) || parsedId === 0){
+      if (isNaN(parsedId) || parsedId === 0) {
         throw new Error("Invalid post id.");
       }
 
       const result = await this.postService.deletePost(user.username, parsedId);
 
       res.status(200).json({ message: "Post successfully deleted.", result });
-    }catch(err){
+    } catch (err) {
       next(err);
     }
   }

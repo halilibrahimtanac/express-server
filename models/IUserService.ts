@@ -11,5 +11,5 @@ export interface IUserService {
   login(email: string, password: string): Promise<ReturnType>;
   refreshToken(rfrshTkn: string, user: Partial<User>): Promise<string>;
   logout(rfrshTkn: string, accessToken: string): Promise<{ count: number }>;
-  profile(id: number): Promise<Partial<User> | null>;
+  profile(username: string): Promise<Partial<User> | null>;
 }

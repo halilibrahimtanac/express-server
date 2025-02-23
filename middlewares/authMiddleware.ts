@@ -56,6 +56,11 @@ export default async function authorize(  // Make the function async
     req.user = decoded;
     next();
   } catch (error) {
+    await prisma.token.deleteMany({
+      where: {
+        token
+      }
+    });
     console.error("Token verification error:", error);
     res.status(401).json({ error: "Invalid or expired token" });
   }

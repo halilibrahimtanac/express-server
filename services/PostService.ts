@@ -9,6 +9,14 @@ class PostService implements IPostService {
     return await this.postRepository.getPosts(username);
   }
 
+  async getAllPosts(): Promise<Post[] | null> {
+    return await this.postRepository.getAllPosts();
+  }
+
+  async getRelatedPosts(postId: number): Promise<Post[] | null> {
+    return await this.postRepository.getRelatedPosts(postId);
+  }
+
   async createPost(
     username: string,
     newPost: Partial<Post>
