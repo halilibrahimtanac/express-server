@@ -60,6 +60,23 @@ class PostRepository extends BaseRepository implements IPostRepository {
     return createdPost;
   }
 
+  async updatePost(
+    postId: number,
+    updatedPost: Partial<Post>
+  ): Promise<Post | null> {
+
+    const result = await this.dbClient.post.update({
+      where: { id: postId },
+      data: {
+        body: updatedPost.body,
+        image: updatedPost.image,
+        video: updatedPost.video,
+      },
+    });
+
+    return result;
+  }
+
   async deletePost(username: string, postId: number): Promise<Post | null> {
     const user = await this.userRepository.getUserByUserName(username, ["id"]);
 

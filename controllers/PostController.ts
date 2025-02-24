@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { IPostService } from "../models/IPostService";
+import FileService from "../services/FileService";
 
 export default class PostController {
-  constructor(private postService: IPostService) {}
+  fileService: FileService;
+  constructor(private postService: IPostService) {
+    this.fileService = new FileService();
+  }
 
   async getPosts(req: Request, res: Response, next: NextFunction) {
     try {
@@ -41,11 +45,29 @@ export default class PostController {
 
   async createPost(req: Request, res: Response, next: NextFunction) {
     try {
-      const { newPost } = req.body;
+      let { newPost } = req.body;
+      const { username } = req.user;
+      const file = req.file;
+
+      newPost = JSON.parse(newPost);
+
       const result = await this.postService.createPost(
         req.user.username,
         newPost
       );
+
+      if(file && result){
+        const filePath = await this.fileService.saveFile(username, result.id, file);
+
+        const mimeType = file.mimetype.startsWith('video/') ? 'video' : 'image';
+        const updatedPost = await this.postService.updatePost(result.id, {
+          [mimeType]: filePath
+        });
+
+        res.status(201).json({ updatedPost });
+        return;
+      }
+
       res.status(201).json({ result });
     } catch (err) {
       next(err);

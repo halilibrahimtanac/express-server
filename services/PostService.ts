@@ -24,8 +24,15 @@ class PostService implements IPostService {
     return await this.postRepository.createPost(username, newPost);
   }
 
+  async updatePost(
+    postId: number,
+    updatedPost: Partial<Post>
+  ): Promise<Post | null> {
+    return await this.postRepository.updatePost(postId, updatedPost);
+  }
+
   async deletePost(username: string, postId: number): Promise<Post | null> {
-    return await this.postRepository.deletePost(username, postId)
+    return await this.postRepository.deletePost(username, postId);
   }
 }
 

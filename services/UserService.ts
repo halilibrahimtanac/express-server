@@ -117,14 +117,8 @@ class UserService implements IUserService {
         ...foundResult.user,
       });
 
-      const user = await this.userRepository.getUserByUserName(verified.username, ["id"]);
-      if (!user) throw new Error("User not found");
-      const userId = user.id;
-
-      if(!userId) throw new Error("Invalid user ID!")
-
       await this.tokenRepository.addUserToken({
-        userId: userId,
+        userId: foundResult.userId as number,
         token: accessToken,
         type: "access"
       });
