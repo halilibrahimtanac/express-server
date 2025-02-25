@@ -1,8 +1,14 @@
-import express, { Router, Request, Response, NextFunction, ErrorRequestHandler } from "express";
-import path from 'path';
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import express, {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  ErrorRequestHandler,
+} from "express";
+import path from "path";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import { readdir } from "fs/promises";
 
 const app = express();
@@ -21,44 +27,54 @@ app.use(
   })
 );
 
-const controllersDir = path.join(__dirname, 'routes');
+const controllersDir = path.join(__dirname, "routes");
 
 async function registerRoutes() {
   const files = await readdir(controllersDir);
-  
+
   for (const file of files) {
-      const routeName = path.parse(file).name;
-      const routePath = path.join(controllersDir, file);
-      
-      const routeModule = await import(routePath);
-      const router: Router = routeModule.default || routeModule;
-      
-      app.use(`/api/${routeName}`, router);
+    const routeName = path.parse(file).name;
+    const routePath = path.join(controllersDir, file);
+
+    const routeModule = await import(routePath);
+    const router: Router = routeModule.default || routeModule;
+
+    app.use(`/api/${routeName}`, router);
   }
 }
 
-registerRoutes().then(() => {
-  const globalErrorHandler: ErrorRequestHandler = (
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): void => {
-    console.error("Global Error:", err.stack);
+registerRoutes()
+  .then(() => {
+    const globalErrorHandler: ErrorRequestHandler = (
+      err: any,
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): void => {
+      console.error("Global Error:", err.stack);
 
-    // Default server error
-    res.status(500).json({ 
-      error: err.message,
+      // Default server error
+      res.status(500).json({
+        error: err.message,
+      });
+      return;
+    };
+
+    app.use(globalErrorHandler);
+
+    app.get('/media/:filename', (req, res) => {
+      const { filename } = req.params;
+      const filePath = path.join(__dirname, filename);
+      res.sendFile(filePath, (err) => {
+        if (err) res.status(404).send('File not found');
+      });
     });
-    return;
-  };
 
-  app.use(globalErrorHandler);
-
-  console.log("✅ Routes registered, error handler added.");
-}).catch(err => {
-  console.error("Error registering routes:", err);
-});
+    console.log("✅ Routes registered, error handler added.");
+  })
+  .catch((err) => {
+    console.error("Error registering routes:", err);
+  });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

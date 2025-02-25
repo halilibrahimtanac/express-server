@@ -1,17 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import { IPostService } from "../models/IPostService";
 import FileService from "../services/FileService";
+import { idParser, } from "../lib/utils";
 
 export default class PostController {
-  fileService: FileService;
   constructor(private postService: IPostService) {
-    this.fileService = new FileService();
+  }
+
+  async getPost(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { postId } = req.params;
+      const parsedId = idParser(postId);
+
+      const result = await this.postService.getPost(parsedId);
+
+      if (!result) {
+        res.status(404).json({ message: "Post not found" });
+        return;
+      }
+
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
   }
 
   async getPosts(req: Request, res: Response, next: NextFunction) {
     try {
       const { user } = req;
-      const result = await this.postService.getPosts(user.username);
+      const forUser = req.path === "/get-user-posts";
+      let result = await this.postService.getPosts(forUser ? user.username : null);
 
       res.status(200).json({ posts: result });
     } catch (err) {
@@ -19,26 +37,15 @@ export default class PostController {
     }
   }
 
-  async getAllPosts(req: Request, res: Response, next: NextFunction) {
+  async getRelatedPosts(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.postService.getAllPosts();
+      const { postId } = req.params;
+      let parsedId = idParser(postId);
+
+      let result = await this.postService.getRelatedPosts(parsedId);
 
       res.status(200).json({ posts: result });
     } catch (err) {
-      next(err);
-    }
-  }
-
-  async getRelatedPosts(req: Request, res: Response, next: NextFunction){
-    try{
-      const { postId } = req.params;
-      let parsedId = parseInt(postId);
-      if(isNaN(parsedId) || parsedId === 0) throw new Error("Invalid post id.");
-
-      const result = await this.postService.getRelatedPosts(parsedId);
-
-      res.status(200).json({ posts: result });
-    }catch(err){
       next(err);
     }
   }
@@ -56,12 +63,16 @@ export default class PostController {
         newPost
       );
 
-      if(file && result){
-        const filePath = await this.fileService.saveFile(username, result.id, file);
+      if (file && result) {
+        const filePath = await FileService.saveFile(
+          username,
+          result.id,
+          file
+        );
 
-        const mimeType = file.mimetype.startsWith('video/') ? 'video' : 'image';
+        const mimeType = file.mimetype.startsWith("video/") ? "video" : "image";
         const updatedPost = await this.postService.updatePost(result.id, {
-          [mimeType]: filePath
+          [mimeType]: filePath,
         });
 
         res.status(201).json({ updatedPost });
@@ -78,11 +89,7 @@ export default class PostController {
     try {
       const { user } = req;
       const { postId } = req.params;
-      const parsedId = parseInt(postId);
-
-      if (isNaN(parsedId) || parsedId === 0) {
-        throw new Error("Invalid post id.");
-      }
+      const parsedId = idParser(postId);
 
       const result = await this.postService.deletePost(user.username, parsedId);
 

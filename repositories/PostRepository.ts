@@ -9,32 +9,12 @@ class PostRepository extends BaseRepository implements IPostRepository {
     super(dbClient);
   }
 
-  async getPosts(username: string): Promise<Post[] | null> {
-    const user = await this.userRepository.getUserByUserName(username, ["id"]);
-
-    if (!user) {
-      return null;
-    }
-
+  async getPostsWithFilter<T extends keyof Post>(value?: number, selectedField?: T): Promise<Post[] | Post | null> {
     const posts = await this.dbClient.post.findMany({
-      where: { createdBy: user.id },
+      where: { ...selectedField ? { [selectedField]: value } : {} },
     });
 
-    return posts;
-  }
-
-  async getAllPosts(): Promise<Post[] | null> {
-    const posts = await this.dbClient.post.findMany({ where: { parentPost: null }});
-
-    return posts;
-  }
-
-  async getRelatedPosts(postId: number): Promise<Post[] | null> {
-    const posts = await this.dbClient.post.findMany({
-      where: { parentPost: postId },
-    });
-
-    return posts;
+    return posts.length === 1 ? posts[0] : posts;
   }
 
   async createPost(

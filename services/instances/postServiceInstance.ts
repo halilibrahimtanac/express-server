@@ -7,6 +7,6 @@ const prismaClient = new PrismaClient();
 const userRepository = new UserRepository(prismaClient);
 const postRepository = new PostRepository(prismaClient, userRepository);
 
-const postService = new PostService(postRepository);
+const postService = new PostService(postRepository, userRepository);
 
 export default postService;
