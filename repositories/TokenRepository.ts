@@ -2,9 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { ITokenRepository } from "../models/ITokenRepository";
 import { Token } from "../models/Types";
 import BaseRepository from "./BaseRepository";
+import JWTService from "../services/JWTService";
 
 class TokenRepository extends BaseRepository implements ITokenRepository {
-  constructor(dbClient: PrismaClient) {
+  constructor(dbClient: PrismaClient, private jwtService: JWTService) {
     super(dbClient);
   }
   
@@ -42,6 +43,30 @@ class TokenRepository extends BaseRepository implements ITokenRepository {
     });
 
     return { count: result.count };
+  }
+
+  async refreshToken(rfrshTkn: string) {
+    try {
+      const verified = this.jwtService.verifyRefreshToken(rfrshTkn);
+      const foundResult = await this.getUserToken(rfrshTkn);
+      if (!foundResult) {
+        throw new Error("Invalid token! (Not found in database)");
+      }
+
+      const accessToken = this.jwtService.generateAccessToken({
+        ...foundResult.user,
+      });
+
+      await this.addUserToken({
+        userId: foundResult.userId as number,
+        token: accessToken,
+        type: "access"
+      });
+
+      return accessToken;
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
   }
 }
 

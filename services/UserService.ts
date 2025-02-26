@@ -105,28 +105,8 @@ class UserService implements IUserService {
     }
   }
 
-  async refreshToken(rfrshTkn: string) {
-    try {
-      const verified = this.jwtService.verifyRefreshToken(rfrshTkn);
-      const foundResult = await this.tokenRepository.getUserToken(rfrshTkn);
-      if (!foundResult) {
-        throw new Error("Invalid token! (Not found in database)");
-      }
-
-      const accessToken = this.jwtService.generateAccessToken({
-        ...foundResult.user,
-      });
-
-      await this.tokenRepository.addUserToken({
-        userId: foundResult.userId as number,
-        token: accessToken,
-        type: "access"
-      });
-
-      return accessToken;
-    } catch (err: any) {
-      throw new Error(err.message);
-    }
+  async refresh(rfrshTkn: string) {
+    return await this.tokenRepository.refreshToken(rfrshTkn);
   }
 
   async profile(username: string) {

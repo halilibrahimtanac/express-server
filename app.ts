@@ -62,11 +62,28 @@ registerRoutes()
 
     app.use(globalErrorHandler);
 
-    app.get('/media/:filename', (req, res) => {
+    app.get('/media/:filename', async (req: Request, res: Response): Promise<void> => {
       const { filename } = req.params;
-      const filePath = path.join(__dirname, filename);
-      res.sendFile(filePath, (err) => {
-        if (err) res.status(404).send('File not found');
+      const lastDotIndex = filename.lastIndexOf(".");
+      if (lastDotIndex === -1) {
+        res.status(400).send('Invalid filename');
+        return;
+      }
+      const baseName = filename.substring(0, lastDotIndex).replace(/\./g, "/");
+      const ext = filename.substring(lastDotIndex);
+      const safePath = path.join(__dirname, baseName + ext);
+      
+      // Prevent directory traversal
+      const resolvedPath = path.resolve(safePath);
+      if (!resolvedPath.startsWith(path.resolve(__dirname))) {
+        res.status(403).send('Forbidden');
+        return;
+      }
+    
+      res.sendFile(resolvedPath, (err) => {
+        if (err && !res.headersSent) {
+          res.status(404).send('File not found');
+        }
       });
     });
 

@@ -57,8 +57,7 @@ export default class UserController {
   async refresh(req: Request, res: Response, next: NextFunction){
     try{
       const { refreshToken } = req.cookies;
-      const { user } = req.body;
-      const result = await this.userService.refreshToken(refreshToken, user);
+      const result = await this.userService.refresh(refreshToken);
 
       res.status(200).json({ accessToken: result });
     }catch(err){

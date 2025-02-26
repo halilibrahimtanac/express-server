@@ -25,3 +25,9 @@ export type Post = {
   createdAt?: Date | null;
   updatedAt?: Date | null;
 };
+
+export interface GetPostsOptions {
+  username?: string;
+  field?: keyof Post;
+  value?: any;
+}

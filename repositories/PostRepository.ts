@@ -9,7 +9,7 @@ class PostRepository extends BaseRepository implements IPostRepository {
     super(dbClient);
   }
 
-  async getPostsWithFilter<T extends keyof Post>(value?: number, selectedField?: T): Promise<Post[] | Post | null> {
+  async getPostsWithFilter<T extends keyof Post>(value?: number | null, selectedField?: T): Promise<Post[] | Post | null> {
     const posts = await this.dbClient.post.findMany({
       where: { ...selectedField ? { [selectedField]: value } : {} },
     });

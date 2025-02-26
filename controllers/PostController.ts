@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IPostService } from "../models/IPostService";
 import FileService from "../services/FileService";
 import { idParser, } from "../lib/utils";
+import { Post } from "../models/Types";
 
 export default class PostController {
   constructor(private postService: IPostService) {
@@ -28,21 +29,22 @@ export default class PostController {
   async getPosts(req: Request, res: Response, next: NextFunction) {
     try {
       const { user } = req;
-      const forUser = req.path === "/get-user-posts";
-      let result = await this.postService.getPosts(forUser ? user.username : null);
-
-      res.status(200).json({ posts: result });
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  async getRelatedPosts(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { postId } = req.params;
-      let parsedId = idParser(postId);
-
-      let result = await this.postService.getRelatedPosts(parsedId);
+      const routeType = {
+        "/get-user-posts": {
+          username: user.username,
+        },
+        "/get-all-posts": {
+          field: "parentPost" as keyof Post,
+          value: null
+        },
+        "/get-related-posts": {
+          field: "parentPost" as keyof Post,
+          value: idParser(req.params.postId)
+        }
+      }
+      const foundFilter = Object.keys(routeType).find(k => req.path.startsWith(k))
+      const filter = routeType[foundFilter as keyof typeof routeType];
+      let result = await this.postService.getPosts(filter);
 
       res.status(200).json({ posts: result });
     } catch (err) {
@@ -56,8 +58,10 @@ export default class PostController {
       const { username } = req.user;
       const file = req.file;
 
-      newPost = JSON.parse(newPost);
-
+      if(newPost && typeof newPost === "string"){
+        newPost = JSON.parse(newPost);
+      }
+      
       const result = await this.postService.createPost(
         req.user.username,
         newPost

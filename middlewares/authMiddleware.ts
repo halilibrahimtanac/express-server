@@ -17,6 +17,8 @@ export default async function authorize(  // Make the function async
   res: Response,
   next: NextFunction
 ) {
+  const routePath = req.path;
+  const refreshToken = req.cookies.refreshToken;
   const authHeader = req.headers.authorization;
   
   if (!authHeader) {
@@ -58,7 +60,7 @@ export default async function authorize(  // Make the function async
   } catch (error) {
     await prisma.token.deleteMany({
       where: {
-        token
+        ...routePath === "/logout" ? { OR: [{ token }, { token: refreshToken }]} : { token },
       }
     });
     console.error("Token verification error:", error);
