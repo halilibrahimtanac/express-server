@@ -31,7 +31,7 @@ export default class PostController {
       const { user } = req;
       const routeType = {
         "/get-user-posts": {
-          username: user.username,
+          username: user?.username,
         },
         "/get-all-posts": {
           field: "parentPost" as keyof Post,
@@ -39,7 +39,7 @@ export default class PostController {
         },
         "/get-related-posts": {
           field: "parentPost" as keyof Post,
-          value: idParser(req.params.postId)
+          value: req.params.postId ? idParser(req.params.postId) : 0
         }
       }
       const foundFilter = Object.keys(routeType).find(k => req.path.startsWith(k))
