@@ -54,17 +54,17 @@ export default class PostController {
 
   async createPost(req: Request, res: Response, next: NextFunction) {
     try {
-      let { newPost } = req.body;
+      const { body } = req.body;
       const { username } = req.user;
       const file = req.file;
 
-      if(newPost && typeof newPost === "string"){
+      /* if(newPost && typeof newPost === "string"){
         newPost = JSON.parse(newPost);
-      }
+      } */
       
       const result = await this.postService.createPost(
         req.user.username,
-        newPost
+        { body }
       );
 
       if (file && result) {
