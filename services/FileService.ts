@@ -3,7 +3,7 @@ import path from "path";
 
 class FileService {
   
-  static async saveFile(userName: string, postId: number, file: any) {
+  static async saveFile(userName: string, postId: number | string, file: any) {
     const dir = path.join('uploads', userName, postId.toString());
 
     await fs.mkdir(dir, { recursive: true });

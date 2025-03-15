@@ -112,10 +112,14 @@ class UserService implements IUserService {
   async profile(username: string) {
     try {
       if (!username) {
-        throw new Error("Invalid ID!");
+        throw new Error("Invalid username!");
       }
       const user = await this.userRepository.getUserByUserName(username, [
         "username",
+        "name",
+        "lastname",
+        "birthDate",
+        "profilePicture",
         "email",
         "userType",
         "createdAt",
@@ -126,6 +130,10 @@ class UserService implements IUserService {
     } catch (err) {
       throw new Error("No user found!");
     }
+  }
+
+  async updateUser(updatedUser: Partial<User>){
+    return this.userRepository.updateUser(updatedUser);
   }
 }
 

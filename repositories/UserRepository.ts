@@ -46,6 +46,13 @@ class UserRepository extends BaseRepository implements IUserRepository {
     // Cast the result to `Pick<User, T> | null` to satisfy TypeScript
     return user as Pick<User, T> | null;
   }
+
+  async updateUser(updatedUser: Partial<User>){
+    const result = await this.dbClient.user.update({
+        data: { ...updatedUser },
+        where: { username: updatedUser.username }
+    });
+  }
 }
 
 export default UserRepository;

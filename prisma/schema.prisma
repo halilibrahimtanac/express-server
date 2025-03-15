@@ -14,20 +14,24 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  userType  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  token     Token[]
-  Post      Post[]
+  id             Int      @id @default(autoincrement())
+  name           String?
+  lastname       String?
+  username       String   @unique
+  email          String   @unique
+  profilePicture String?
+  birthDate      DateTime?
+  password       String
+  userType       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  token          Token[]
+  Post           Post[]
 }
 
 model Token {
   id     Int    @id @default(autoincrement())
-  userId Int    
+  userId Int
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   token  String @db.VarChar(255)
   type   String
@@ -43,7 +47,7 @@ model Post {
   video      String?
   createdBy  Int
   user       User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  parentPost Int?     // Allow null for top-level posts
+  parentPost Int? // Allow null for top-level posts
   parent     Post?    @relation("PostToParent", fields: [parentPost], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Post_parent_fkey")
   children   Post[]   @relation("PostToParent")
   createdAt  DateTime @default(now())

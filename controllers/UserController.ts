@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { IUserService } from "../models/IUserService";
+import FileService from "../services/FileService";
 
 export default class UserController {
   constructor(private userService: IUserService) {}
@@ -71,6 +72,28 @@ export default class UserController {
       const result = await this.userService.profile(user.username);
 
       res.status(200).json(result);
+    }catch(err){
+      next(err);
+    }
+  }
+
+  async updateProfile(req: Request, res: Response, next: NextFunction){
+    try{
+      const { user } = req;
+      let { updatedFields } = req.body;
+      const file = req.file;
+      
+      updatedFields = updatedFields || {};
+      updatedFields.username = user.username;
+
+      if(file){
+        const filePath = await FileService.saveFile(user.username, "profilePicture", file);
+        updatedFields.profilePicture = filePath;
+      }
+
+      await this.userService.updateUser(updatedFields);
+
+      res.status(201).json({ message: "Success" });
     }catch(err){
       next(err);
     }
