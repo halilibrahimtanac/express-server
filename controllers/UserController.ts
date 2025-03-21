@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IUserService } from "../models/IUserService";
 import FileService from "../services/FileService";
+import { idParser } from "../lib/utils";
 
 export default class UserController {
   constructor(private userService: IUserService) {}
@@ -94,6 +95,20 @@ export default class UserController {
       await this.userService.updateUser(updatedFields);
 
       res.status(201).json({ message: "Success" });
+    }catch(err){
+      next(err);
+    }
+  }
+
+  async getUserProfile(req: Request, res: Response, next: NextFunction){
+    try{
+      const { id } = req.params;
+      let parsedId = idParser(id);
+      const user = await this.userService.getUserProfile(parsedId);
+      if(!user){
+        throw new Error("User not found!");
+      }
+      res.status(200).json({ user });
     }catch(err){
       next(err);
     }
