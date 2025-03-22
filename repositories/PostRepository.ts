@@ -15,7 +15,7 @@ class PostRepository extends BaseRepository implements IPostRepository {
 ): Promise<(Post & { user: { username: string } })[] | (Post & { user: { username: string } }) | null> {
   const posts = await this.dbClient.post.findMany({
     where: { ...(selectedField ? { [selectedField]: value } : {}) },
-    include: { user: { select: { username: true } } }, // Join with User table
+    include: { user: { select: { username: true, profilePicture: true } } }, // Join with User table
   });
 
   return posts.length === 1 ? posts[0] : posts;

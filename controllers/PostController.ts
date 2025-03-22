@@ -29,9 +29,11 @@ export default class PostController {
   async getPosts(req: Request, res: Response, next: NextFunction) {
     try {
       const { user } = req;
+      const { username } = req.params;
+
       const routeType = {
         "/get-user-posts": {
-          username: user?.username,
+           username: username || user?.username,
         },
         "/get-all-posts": {
           field: "parentPost" as keyof Post,

@@ -13,5 +13,4 @@ export interface IUserService {
   logout(rfrshTkn: string, accessToken: string): Promise<{ count: number }>;
   profile(username: string): Promise<Partial<User> | null>;
   updateUser(updatedUser: Partial<User>): void;
-  getUserProfile(id: number): Promise<Partial<User> | null>;
 }

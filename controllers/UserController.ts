@@ -70,7 +70,8 @@ export default class UserController {
   async profile(req: Request, res: Response, next: NextFunction){
     try{
       const { user } = req;
-      const result = await this.userService.profile(user.username);
+      const { username } = req.params;
+      const result = await this.userService.profile(username || user.username);
 
       res.status(200).json(result);
     }catch(err){
@@ -95,20 +96,6 @@ export default class UserController {
       await this.userService.updateUser(updatedFields);
 
       res.status(201).json({ message: "Success" });
-    }catch(err){
-      next(err);
-    }
-  }
-
-  async getUserProfile(req: Request, res: Response, next: NextFunction){
-    try{
-      const { id } = req.params;
-      let parsedId = idParser(id);
-      const user = await this.userService.getUserProfile(parsedId);
-      if(!user){
-        throw new Error("User not found!");
-      }
-      res.status(200).json({ user });
     }catch(err){
       next(err);
     }

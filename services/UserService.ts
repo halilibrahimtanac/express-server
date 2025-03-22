@@ -135,10 +135,6 @@ class UserService implements IUserService {
   async updateUser(updatedUser: Partial<User>){
     return this.userRepository.updateUser(updatedUser);
   }
-
-  async getUserProfile(id: number){
-    return await this.userRepository.getUserById(id);
-  }
 }
 
 export default UserService;
