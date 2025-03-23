@@ -9,7 +9,7 @@ export type ReturnType = {
 export interface IUserService {
   register(user: User): Promise<ReturnType>;
   login(email: string, password: string): Promise<ReturnType>;
-  refresh(rfrshTkn: string): Promise<string>;
+  refresh(rfrshTkn: string): Promise<{ accessToken: string; user: Partial<User> }>;
   logout(rfrshTkn: string, accessToken: string): Promise<{ count: number }>;
   profile(username: string): Promise<Partial<User> | null>;
   updateUser(updatedUser: Partial<User>): void;

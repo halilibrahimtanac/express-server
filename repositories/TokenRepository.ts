@@ -14,7 +14,7 @@ class TokenRepository extends BaseRepository implements ITokenRepository {
       select: {
         userId: true,
         token: true,
-        user: { select: { username: true, email: true, userType: true } },
+        user: { select: { username: true, email: true, userType: true, profilePicture: true } },
       },
       where: { token: tkn },
     });
@@ -63,7 +63,7 @@ class TokenRepository extends BaseRepository implements ITokenRepository {
         type: "access"
       });
 
-      return accessToken;
+      return { accessToken, user: foundResult.user };
     } catch (err: any) {
       throw new Error(err.message);
     }

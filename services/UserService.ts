@@ -34,6 +34,7 @@ class UserService implements IUserService {
       username: createdUser.username,
       email: createdUser.email,
       userType: createdUser.userType,
+      profilePicture: user.profilePicture
     };
 
     // Generate tokens (delegated to the JWTService)
@@ -76,6 +77,7 @@ class UserService implements IUserService {
       username: user.username,
       email: user.email,
       userType: user.userType,
+      profilePicture: user.profilePicture
     };
 
     // Generate tokens

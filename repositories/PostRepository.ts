@@ -12,13 +12,16 @@ class PostRepository extends BaseRepository implements IPostRepository {
   async getPostsWithFilter<T extends keyof Post>(
   value?: number | null, 
   selectedField?: T
-): Promise<(Post & { user: { username: string } })[] | (Post & { user: { username: string } }) | null> {
+): Promise<(Post & { user: { username: string }, _count: { children: number } })[]> {
   const posts = await this.dbClient.post.findMany({
     where: { ...(selectedField ? { [selectedField]: value } : {}) },
-    include: { user: { select: { username: true, profilePicture: true } } }, // Join with User table
+    include: { 
+      user: { select: { username: true, profilePicture: true } },
+      _count: { select: { children: true } }
+    }
   });
 
-  return posts.length === 1 ? posts[0] : posts;
+  return posts;
 }
 
   async createPost(

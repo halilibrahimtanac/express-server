@@ -61,7 +61,7 @@ export default class UserController {
       const { refreshToken } = req.cookies;
       const result = await this.userService.refresh(refreshToken);
 
-      res.status(200).json({ accessToken: result });
+      res.status(200).json(result);
     }catch(err){
       next(err);
     }

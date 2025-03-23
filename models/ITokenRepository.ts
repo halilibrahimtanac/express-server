@@ -4,5 +4,5 @@ export interface ITokenRepository {
     getUserToken(tkn: string): Promise<{ user: Partial<User>} & Partial<Token>  | null>;
     removeUserToken(rTkn: string, aTkn: string): Promise<{ count: number }>;
     addUserToken(token: Token): Promise<Token>;
-    refreshToken(rfrshTkn: string): Promise<string>;
+    refreshToken(rfrshTkn: string): Promise<{ accessToken: string; user: Partial<User> }>;
 }
