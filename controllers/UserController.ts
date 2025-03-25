@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IUserService } from "../models/IUserService";
 import FileService from "../services/FileService";
-import { idParser } from "../lib/utils";
+import { User } from "../models/Types";
 
 export default class UserController {
   constructor(private userService: IUserService) {}
@@ -82,10 +82,11 @@ export default class UserController {
   async updateProfile(req: Request, res: Response, next: NextFunction){
     try{
       const { user } = req;
-      let { updatedFields } = req.body;
+      let { birthDate } = req.body;
       const file = req.file;
       
-      updatedFields = updatedFields || {};
+      let updatedFields: Partial<User> = {};
+      updatedFields.birthDate = birthDate ? new Date(birthDate) : null;
       updatedFields.username = user.username;
 
       if(file){
