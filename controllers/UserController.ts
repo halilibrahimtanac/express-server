@@ -82,11 +82,17 @@ export default class UserController {
   async updateProfile(req: Request, res: Response, next: NextFunction){
     try{
       const { user } = req;
-      let { birthDate } = req.body;
       const file = req.file;
       
       let updatedFields: Partial<User> = {};
-      updatedFields.birthDate = birthDate ? new Date(birthDate) : null;
+      let userKeys: (keyof User)[] = ["email", "name", "lastname", "birthDate"];
+      
+      userKeys.forEach((ky) => {
+        if(req.body[ky]){
+          updatedFields[ky] = ky === "birthDate" ? new Date(req.body[ky]) : req.body[ky]
+        }
+      });
+
       updatedFields.username = user.username;
 
       if(file){
