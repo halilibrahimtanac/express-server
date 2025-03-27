@@ -27,6 +27,7 @@ model User {
   updatedAt      DateTime @updatedAt
   token          Token[]
   Post           Post[]
+  Like           Like[]
 }
 
 model Token {
@@ -50,6 +51,16 @@ model Post {
   parentPost Int? // Allow null for top-level posts
   parent     Post?    @relation("PostToParent", fields: [parentPost], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Post_parent_fkey")
   children   Post[]   @relation("PostToParent")
+  Like       Like[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Like {
+  id        Int  @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
