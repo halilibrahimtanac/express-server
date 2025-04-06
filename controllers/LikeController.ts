@@ -1,13 +1,19 @@
 import { Request, Response, NextFunction } from "express";
+import { ILikeService } from "../models/ILikeService";
+import { idParser } from "../lib/utils";
 
 export default class LikeController {
-  constructor() {}
+  constructor(private likeService: ILikeService) {}
 
   async likePost(req: Request, res: Response, next: NextFunction) {
     try {
-        const { postId, userId } = req.query;
+        const { postId } = req.params;
+        const parsedId = idParser(postId);
+        const { user } = req.user;
 
-        // service functions
+        const result = await this.likeService.likePost(user.username, parsedId);
+        
+        res.status(200).json(result);
     } catch (err) {
       next(err);
     }
