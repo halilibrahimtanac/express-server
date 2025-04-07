@@ -9,7 +9,7 @@ export default class LikeController {
     try {
         const { postId } = req.params;
         const parsedId = idParser(postId);
-        const { user } = req.user;
+        const { user } = req;
 
         const result = await this.likeService.likePost(user.username, parsedId);
         

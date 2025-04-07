@@ -9,20 +9,20 @@ class PostRepository extends BaseRepository implements IPostRepository {
     super(dbClient);
   }
 
-  async getPostsWithFilter<T extends keyof Post>(
-  value?: number | null, 
-  selectedField?: T
-): Promise<(Post & { user: { username: string }, _count: { children: number } })[]> {
-  const posts = await this.dbClient.post.findMany({
-    where: { ...(selectedField ? { [selectedField]: value } : {}) },
-    include: { 
-      user: { select: { username: true, profilePicture: true } },
-      _count: { select: { children: true } }
-    }
-  });
+  async getPostsWithFilter<T extends keyof Post>(value?: number | null, selectedField?: T): Promise<
+    (Post & { user: { username: string }; _count: { children: number }; Like: { userId: number; postId: number; user: { username: string } }[] })[]
+  > {
+    const posts = await this.dbClient.post.findMany({
+      where: { ...(selectedField ? { [selectedField]: value } : {}) },
+      include: {
+        user: { select: { username: true, profilePicture: true } },
+        _count: { select: { children: true, Like: true } },
+        Like: { select: { userId: true, postId: true, user: { select: { username: true } } } },
+      },
+    });
 
-  return posts;
-}
+    return posts;
+  }
 
   async createPost(
     username: string,
@@ -51,7 +51,6 @@ class PostRepository extends BaseRepository implements IPostRepository {
     postId: number,
     updatedPost: Partial<Post>
   ): Promise<Post | null> {
-
     const result = await this.dbClient.post.update({
       where: { id: postId },
       data: {
