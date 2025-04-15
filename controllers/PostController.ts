@@ -105,4 +105,18 @@ export default class PostController {
       next(err);
     }
   }
+
+  async editPost(req: Request, res: Response, next: NextFunction) {
+    try{
+      const { postId } = req.params;
+      const { editBody } = req.body;
+      const parsedId = idParser(postId);
+
+      await this.postService.updatePost(parsedId, { body: editBody });
+
+      res.status(201).json({ success: true });
+    }catch(err){
+      next(err);
+    }
+  }
 }
