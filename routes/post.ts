@@ -17,6 +17,6 @@ router.get("/get-all-posts", authorize, (req, res, next) => postController.getPo
 router.get("/get-related-posts/:postId", authorize, (req, res, next) => postController.getPosts(req, res, next));
 router.post("/new-post", authorize, upload.single('file'), (req, res, next) => postController.createPost(req, res, next));
 router.delete("/delete-post/:postId", authorize, (req, res, next) => postController.deletePost(req, res, next))
-router.patch("/edit/:postId", authorize, (req, res, next) => postController.editPost(req, res, next))
+router.patch("/edit", authorize, upload.single('file'), (req, res, next) => postController.editPost(req, res, next))
 
 export default router;

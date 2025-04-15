@@ -108,11 +108,25 @@ export default class PostController {
 
   async editPost(req: Request, res: Response, next: NextFunction) {
     try{
-      const { postId } = req.params;
-      const { editBody } = req.body;
+      const { postId, body } = req.body;
+      const { username } = req.user;
       const parsedId = idParser(postId);
+      const file = req.file;
 
-      await this.postService.updatePost(parsedId, { body: editBody });
+      let filePath;
+      let mimeType;
+      if(file){
+        filePath = await FileService.saveFile(
+          username,
+          postId,
+          file
+        );
+        mimeType = file.mimetype.startsWith("video/") ? "video" : "image";
+      }
+
+      const updateObj = { body };
+      if(filePath && mimeType) Object.assign(updateObj, { [mimeType]: filePath });
+      await this.postService.updatePost(parsedId, updateObj);
 
       res.status(201).json({ success: true });
     }catch(err){
